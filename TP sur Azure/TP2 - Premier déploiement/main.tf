@@ -1,3 +1,6 @@
+provider "azurerm" {
+  features {}
+}
 resource "azurerm_resource_group" "tfeazytraining-gp" {
   name     = "my-eazytraining-rg"
   location = "West Europe"
@@ -34,7 +37,13 @@ resource "azurerm_network_security_group" "tfeazytraining-nsg" {
     environment = "my-eazytraining-env"
   }
 }
-
+# Créez une adresse IP publique 
+resource "azurerm_public_ip" "tfeazytraining_ip" {
+  name                = "example-pip"
+  location            = azurerm_resource_group.tfeazytraining-gp.location
+  resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
+  allocation_method   = "Dynamic"
+}
 # Create a Network Interface
 resource "azurerm_network_interface" "tfeazytraining-vnic" {
   name                = "my-eazytraining-nic"
@@ -45,7 +54,7 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
     name                          = "my-eazytraining-nic-ip"
     subnet_id                     = azurerm_subnet.tfeazytraining-subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.tfeazytraining.id
+    public_ip_address_id          = azurerm_public_ip.tfeazytraining_ip.id
   }
 
   tags = {
